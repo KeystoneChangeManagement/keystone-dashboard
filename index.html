@@ -255,18 +255,60 @@
         }
         .asset-link:hover { text-decoration: underline; }
 
-        /* ── Communications table column alignment ── */
-        .section-col:last-child .asset-table {
-            table-layout: fixed;
+        /* ── Table column widths (all tables) ── */
+        .asset-table { table-layout: fixed; }
+        .asset-table th:nth-child(1),
+        .asset-table td:nth-child(1) { width: 34%; }
+        .asset-table th:nth-child(2),
+        .asset-table td:nth-child(2) { width: 22%; }
+        .asset-table th:nth-child(3),
+        .asset-table td:nth-child(3) { width: 22%; }
+        .asset-table th:nth-child(4),
+        .asset-table td:nth-child(4) { width: 22%; }
+
+        /* ── Asset name cell with hyperlink support ── */
+        .name-cell { position: relative; vertical-align: middle; }
+        .name-edit-span {
+            display: inline;
+            outline: none;
+            word-break: break-word;
         }
-        .section-col:last-child .asset-table th:nth-child(1),
-        .section-col:last-child .asset-table td:nth-child(1) { width: 38%; }
-        .section-col:last-child .asset-table th:nth-child(2),
-        .section-col:last-child .asset-table td:nth-child(2) { width: 22%; }
-        .section-col:last-child .asset-table th:nth-child(3),
-        .section-col:last-child .asset-table td:nth-child(3) { width: 22%; }
-        .section-col:last-child .asset-table th:nth-child(4),
-        .section-col:last-child .asset-table td:nth-child(4) { width: 18%; }
+        .name-edit-span:empty:before {
+            content: 'Enter name...';
+            color: #CBD5E1;
+            font-style: italic;
+            pointer-events: none;
+        }
+        .name-link {
+            color: #3B82F6;
+            text-decoration: none;
+            font-weight: 500;
+            word-break: break-word;
+        }
+        .name-link:hover { text-decoration: underline; }
+        .name-plain { word-break: break-word; }
+        /* Edit mode: show editable span + link btn; hide view elements */
+        body:not(.view-mode) .name-edit-span { display: inline; }
+        body:not(.view-mode) .name-link,
+        body:not(.view-mode) .name-plain      { display: none !important; }
+        /* View mode: hide editable span + link btn; show view elements */
+        body.view-mode .name-edit-span        { display: none !important; }
+        body.view-mode .name-link,
+        body.view-mode .name-plain            { display: inline; }
+        .link-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.78rem;
+            padding: 1px 3px;
+            border-radius: 3px;
+            color: #CBD5E1;
+            vertical-align: middle;
+            transition: color 0.12s;
+            line-height: 1;
+        }
+        .link-btn:hover { color: #3B82F6; }
+        .link-btn.has-url { color: #3B82F6; }
 
         /* ── Edit mode ── */
         [contenteditable]:hover {
@@ -608,13 +650,8 @@
         <span class="ws-badge" id="detail-badge"></span>
     </div>
 
-    <!-- ─── TOP SECTION: Ready ─── -->
+    <!-- ─── SINGLE SECTION: All Assets ─── -->
     <div class="section-panel">
-        <div class="section-header ready">
-            <span style="font-size:1rem;">&#10003;</span>
-            <h3>Ready for Use &nbsp;/&nbsp; Ready for Review</h3>
-            <span class="section-label ready">Available Now</span>
-        </div>
         <div class="section-columns">
 
             <!-- TRAINING -->
@@ -624,17 +661,9 @@
                 <div class="asset-type">
                     <div class="asset-type-header">Job Aid <span class="asset-count">0</span></div>
                     <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Status</th><th>Owner</th><th>Link</th></tr></thead>
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
                         <tbody>
-                            <!-- TEMPLATE ROW (duplicate and fill in):
-                            <tr>
-                                <td>Job Aid Title</td>
-                                <td><span class="chip chip-use">Ready for Use</span></td>
-                                <td>Owner Name</td>
-                                <td><a class="asset-link" href="#">View</a></td>
-                            </tr>
-                            -->
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add job aid entries here</td></tr>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -642,9 +671,9 @@
                 <div class="asset-type">
                     <div class="asset-type-header">SOP <span class="asset-count">0</span></div>
                     <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Status</th><th>Owner</th><th>Link</th></tr></thead>
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
                         <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add SOP entries here</td></tr>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -652,9 +681,9 @@
                 <div class="asset-type">
                     <div class="asset-type-header">vILT <span class="asset-count">0</span></div>
                     <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Status</th><th>Owner</th><th>Link</th></tr></thead>
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
                         <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add vILT entries here</td></tr>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -662,19 +691,9 @@
                 <div class="asset-type">
                     <div class="asset-type-header">eLearning / WBT <span class="asset-count">0</span></div>
                     <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Status</th><th>Owner</th><th>Link</th></tr></thead>
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
                         <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add eLearning entries here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">Quick Reference Guide <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Status</th><th>Owner</th><th>Link</th></tr></thead>
-                        <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add QRG entries here</td></tr>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -682,9 +701,19 @@
                 <div class="asset-type">
                     <div class="asset-type-header">Overview Videos <span class="asset-count">0</span></div>
                     <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Status</th><th>Owner</th><th>Link</th></tr></thead>
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
                         <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add video entries here</td></tr>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="asset-type">
+                    <div class="asset-type-header">Pendo <span class="asset-count">0</span></div>
+                    <table class="asset-table">
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
+                        <tbody>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -697,17 +726,9 @@
                 <div class="asset-type">
                     <div class="asset-type-header">Go-Live Series Messages <span class="asset-count">0</span></div>
                     <table class="asset-table">
-                        <thead><tr><th>Message Name</th><th>Status</th><th>Audience</th><th>Link</th></tr></thead>
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
                         <tbody>
-                            <!-- TEMPLATE ROW:
-                            <tr>
-                                <td>Message #1 — Subject Line</td>
-                                <td><span class="chip chip-review">Ready for Review</span></td>
-                                <td>All Employees</td>
-                                <td><a class="asset-link" href="#">View</a></td>
-                            </tr>
-                            -->
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add go-live messages here</td></tr>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -715,19 +736,19 @@
                 <div class="asset-type">
                     <div class="asset-type-header">Learning Checklists <span class="asset-count">0</span></div>
                     <table class="asset-table">
-                        <thead><tr><th>Checklist Name</th><th>Status</th><th>Audience</th><th>Link</th></tr></thead>
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
                         <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add learning checklists here</td></tr>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="asset-type">
-                    <div class="asset-type-header">Leader Communications <span class="asset-count">0</span></div>
+                    <div class="asset-type-header">Programmatic Resources <span class="asset-count">0</span></div>
                     <table class="asset-table">
-                        <thead><tr><th>Communication Name</th><th>Status</th><th>Audience</th><th>Link</th></tr></thead>
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
                         <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add leader communications here</td></tr>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -735,136 +756,16 @@
                 <div class="asset-type">
                     <div class="asset-type-header">Change Impact Assessment <span class="asset-count">0</span></div>
                     <table class="asset-table">
-                        <thead><tr><th>Assessment Name</th><th>Status</th><th>Audience</th><th>Link</th></tr></thead>
+                        <thead><tr><th>Asset Name</th><th>Audience</th><th>Status</th><th>Current Owner</th></tr></thead>
                         <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add change impact assessments here</td></tr>
+                            <tr class="placeholder-row"><td colspan="4">No items yet</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
         </div>
-    </div><!-- end ready section -->
-
-    <!-- ─── BOTTOM SECTION: Coming Soon ─── -->
-    <div class="section-panel">
-        <div class="section-header coming-soon">
-            <span style="font-size:1rem;">&#8987;</span>
-            <h3>Coming Soon &mdash; Ready Within the Next Few Weeks</h3>
-            <span class="section-label coming-soon">In Progress</span>
-        </div>
-        <div class="section-columns">
-
-            <!-- TRAINING -->
-            <div class="section-col">
-                <div class="col-title">&#128218; Training</div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">Job Aid <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Target Date</th><th>Owner</th><th>Notes</th></tr></thead>
-                        <tbody>
-                            <!-- TEMPLATE ROW:
-                            <tr>
-                                <td>Job Aid Title</td>
-                                <td>MM/DD/YYYY</td>
-                                <td>Owner Name</td>
-                                <td>Brief note on status</td>
-                            </tr>
-                            -->
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add upcoming job aids here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">SOP <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Target Date</th><th>Owner</th><th>Notes</th></tr></thead>
-                        <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add upcoming SOPs here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">vILT <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Target Date</th><th>Owner</th><th>Notes</th></tr></thead>
-                        <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add upcoming vILTs here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">eLearning / WBT <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Target Date</th><th>Owner</th><th>Notes</th></tr></thead>
-                        <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add upcoming eLearning here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">Quick Reference Guide <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Target Date</th><th>Owner</th><th>Notes</th></tr></thead>
-                        <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add upcoming QRGs here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">Overview Videos <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Asset Name</th><th>Target Date</th><th>Owner</th><th>Notes</th></tr></thead>
-                        <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add upcoming videos here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- COMMUNICATIONS -->
-            <div class="section-col">
-                <div class="col-title">&#128172; Communications</div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">Go-Live Series Messages <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Message Name</th><th>Target Date</th><th>Audience</th><th>Notes</th></tr></thead>
-                        <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add upcoming go-live messages here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">Learning Checklists <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Checklist Name</th><th>Target Date</th><th>Audience</th><th>Notes</th></tr></thead>
-                        <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add upcoming learning checklists here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="asset-type">
-                    <div class="asset-type-header">Leader Communications <span class="asset-count">0</span></div>
-                    <table class="asset-table">
-                        <thead><tr><th>Communication Name</th><th>Target Date</th><th>Audience</th><th>Notes</th></tr></thead>
-                        <tbody>
-                            <tr class="placeholder-row"><td colspan="4">No items yet — add upcoming leader communications here</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-    </div><!-- end coming soon section -->
+    </div><!-- end panel -->
 
 </div><!-- end detail page -->
 
@@ -1087,17 +988,13 @@
     }
 
     function findTable(section, columnType, assetType) {
-        for (const panel of document.querySelectorAll('#detail-page .section-panel')) {
-            const isReady      = !!panel.querySelector('.section-header.ready');
-            const panelSection = isReady ? 'ready' : 'coming_soon';
-            if (panelSection !== section) continue;
-            const cols = panel.querySelectorAll('.section-col');
-            const col  = columnType === 'training' ? cols[0] : cols[1];
-            if (!col) continue;
-            for (const block of col.querySelectorAll('.asset-type')) {
-                if (getAssetTypeName(block) === assetType) {
-                    return block.querySelector('.asset-table');
-                }
+        // section is ignored — all assets now live in one panel
+        const cols = document.querySelectorAll('#detail-page .section-col');
+        const col  = columnType === 'training' ? cols[0] : cols[1];
+        if (!col) return null;
+        for (const block of col.querySelectorAll('.asset-type')) {
+            if (getAssetTypeName(block) === assetType) {
+                return block.querySelector('.asset-table');
             }
         }
         return null;
@@ -1109,14 +1006,88 @@
         return clone.textContent.trim();
     }
 
+    // ── Name cell with hyperlink support ────────────
+    function buildNameCell(name, url) {
+        const td = document.createElement('td');
+        td.className  = 'name-cell';
+        td.dataset.url = url || '';
+
+        // View: anchor (when URL set)
+        const anchor = document.createElement('a');
+        anchor.className = 'name-link';
+        anchor.href      = url || '#';
+        anchor.target    = '_blank';
+        anchor.rel       = 'noopener noreferrer';
+        anchor.textContent = name;
+        if (!url) anchor.style.display = 'none';
+        td.appendChild(anchor);
+
+        // View: plain text (when no URL)
+        const plain = document.createElement('span');
+        plain.className   = 'name-plain';
+        plain.textContent = name;
+        if (url) plain.style.display = 'none';
+        td.appendChild(plain);
+
+        // Edit: contenteditable span
+        const editSpan = document.createElement('span');
+        editSpan.className       = 'name-edit-span';
+        editSpan.contentEditable = 'true';
+        editSpan.textContent     = name;
+        editSpan.addEventListener('input', () => {
+            const txt = editSpan.textContent;
+            anchor.textContent = txt;
+            plain.textContent  = txt;
+            scheduleAutoSave();
+        });
+        td.appendChild(editSpan);
+
+        // Edit: link button
+        const linkBtn = document.createElement('button');
+        linkBtn.className = 'link-btn edit-control' + (url ? ' has-url' : '');
+        linkBtn.title     = url ? 'Edit or remove link' : 'Add link';
+        linkBtn.innerHTML = '&#128279;';
+        linkBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const current = td.dataset.url || '';
+            const entered = prompt('Enter URL for this asset:\n(Leave blank to remove the link)', current);
+            if (entered === null) return;
+            const trimmed = entered.trim();
+            td.dataset.url  = trimmed;
+            anchor.href     = trimmed || '#';
+            if (trimmed) {
+                anchor.style.display = '';
+                plain.style.display  = 'none';
+                linkBtn.classList.add('has-url');
+                linkBtn.title = 'Edit or remove link';
+            } else {
+                anchor.style.display = 'none';
+                plain.style.display  = '';
+                linkBtn.classList.remove('has-url');
+                linkBtn.title = 'Add link';
+            }
+            anchor.textContent = editSpan.textContent;
+            plain.textContent  = editSpan.textContent;
+            scheduleAutoSave();
+        });
+        td.appendChild(linkBtn);
+        return td;
+    }
+
     function buildDataRow(rowData) {
         const tr = document.createElement('tr');
         tr.dataset.rowId = rowData.id || '';
-        ['col1','col2','col3','col4'].forEach((col, i) => {
+
+        // Parse name + optional URL from col1 ("name|||https://url")
+        const raw   = rowData.col1 || '';
+        const parts = raw.split('|||');
+        tr.appendChild(buildNameCell(parts[0] || '', parts[1] || ''));
+
+        // Remaining cols: standard contenteditable
+        ['col2','col3','col4'].forEach(col => {
             const td = document.createElement('td');
             td.contentEditable = 'true';
             td.textContent     = rowData[col] || '';
-            td.setAttribute('data-placeholder', i === 0 ? 'Enter name...' : '');
             tr.appendChild(td);
         });
         addDeleteButton(tr);
@@ -1133,24 +1104,29 @@
         // Collect all visible rows
         const rows = [];
         let pos = 0;
-        document.querySelectorAll('#detail-page .section-panel').forEach(panel => {
-            const section = panel.querySelector('.section-header.ready') ? 'ready' : 'coming_soon';
-            panel.querySelectorAll('.section-col').forEach((col, ci) => {
-                const columnType = ci === 0 ? 'training' : 'communications';
-                col.querySelectorAll('.asset-type').forEach(block => {
-                    const assetType = getAssetTypeName(block);
-                    block.querySelectorAll('tbody tr:not(.placeholder-row)').forEach(tr => {
-                        if (tr.style.display === 'none') return;
-                        const tds = tr.querySelectorAll('td:not(.edit-control)');
-                        rows.push({
-                            workstream_id: currentWsId,
-                            section, column_type: columnType, asset_type: assetType,
-                            col1: tds[0]?.textContent || '',
-                            col2: tds[1]?.textContent || '',
-                            col3: tds[2]?.textContent || '',
-                            col4: tds[3]?.textContent || '',
-                            position: pos++
-                        });
+        document.querySelectorAll('#detail-page .section-col').forEach((col, ci) => {
+            const columnType = ci === 0 ? 'training' : 'communications';
+            col.querySelectorAll('.asset-type').forEach(block => {
+                const assetType = getAssetTypeName(block);
+                block.querySelectorAll('tbody tr:not(.placeholder-row)').forEach(tr => {
+                    if (tr.style.display === 'none') return;
+                    // Name cell: combine text + URL
+                    const nameCell = tr.querySelector('.name-cell');
+                    let col1val = '';
+                    if (nameCell) {
+                        const txt = (nameCell.querySelector('.name-edit-span')?.textContent || '').trim();
+                        const url = nameCell.dataset.url || '';
+                        col1val   = url ? txt + '|||' + url : txt;
+                    }
+                    const dataTds = tr.querySelectorAll('td:not(.edit-control):not(.name-cell)');
+                    rows.push({
+                        workstream_id: currentWsId,
+                        section: 'main', column_type: columnType, asset_type: assetType,
+                        col1: col1val,
+                        col2: dataTds[0]?.textContent || '',
+                        col3: dataTds[1]?.textContent || '',
+                        col4: dataTds[2]?.textContent || '',
+                        position: pos++
                     });
                 });
             });
@@ -1215,20 +1191,22 @@
 
     function addRow(table) {
         const tbody    = table.querySelector('tbody');
-        const colCount = table.querySelectorAll('thead th').length - 1;
+        const colCount = table.querySelectorAll('thead th').length - 1; // -1 for delete col
         const ph       = tbody.querySelector('.placeholder-row');
         if (ph) ph.style.display = 'none';
         const newRow = document.createElement('tr');
         newRow.dataset.rowId = '';
-        for (let i = 0; i < colCount; i++) {
+        // First col: name cell with link button
+        newRow.appendChild(buildNameCell('', ''));
+        // Remaining cols: standard contenteditable
+        for (let i = 1; i < colCount; i++) {
             const td = document.createElement('td');
             td.contentEditable = 'true';
-            td.setAttribute('data-placeholder', i === 0 ? 'Enter name...' : '');
             newRow.appendChild(td);
         }
         addDeleteButton(newRow);
         tbody.appendChild(newRow);
-        newRow.querySelector('td').focus();
+        newRow.querySelector('.name-edit-span').focus();
         updateCounts();
     }
 
