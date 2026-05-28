@@ -363,8 +363,7 @@
         /* ── View mode — hide all edit controls ── */
         body.view-mode .edit-control,
         body.view-mode .add-row-btn,
-        body.view-mode .tile-add,
-        body.view-mode .save-btn { display: none !important; }
+        body.view-mode .tile-add { display: none !important; }
 
         body.view-mode .tile-controls { opacity: 0 !important; pointer-events: none !important; }
 
@@ -374,24 +373,18 @@
             cursor: default;
         }
 
-        .save-btn {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.35);
-            padding: 7px 18px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            font-family: 'EJ Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            cursor: pointer;
-            display: flex;
+        .autosave-indicator {
+            display: none;
             align-items: center;
             gap: 6px;
-            white-space: nowrap;
-            transition: background 0.12s, border-color 0.12s;
+            font-size: 0.78rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.65);
             margin-left: 12px;
+            white-space: nowrap;
+            transition: color 0.2s;
         }
-        .save-btn:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.6); }
+        body:not(.view-mode) .autosave-indicator { display: flex; }
 
         /* ── Tile edit controls ── */
         .tile { position: relative; }
@@ -498,7 +491,7 @@
         </label>
         <span class="mode-label">Edit</span>
     </div>
-    <button class="save-btn" id="save-btn" onclick="saveFile()">&#128190; Save</button>
+    <div class="autosave-indicator" id="autosave-indicator">&#10003; Auto-save on</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════
@@ -812,40 +805,30 @@
     let isSaving     = false;
     const grid = document.getElementById("tiles-grid");
 
-    // ── Save status indicator ────────────────────────
+    // ── Auto-save status indicator ───────────────────
     function setSaveStatus(status) {
-        const btn = document.getElementById('save-btn');
-        if (!btn) return;
+        const el = document.getElementById('autosave-indicator');
+        if (!el) return;
         if (status === 'saving') {
-            btn.innerHTML  = '&#8987; Saving...';
-            btn.disabled   = true;
-            btn.style.background  = '';
-            btn.style.borderColor = '';
+            el.innerHTML = '&#8987; Saving...';
+            el.style.color = 'rgba(255,255,255,0.5)';
         } else if (status === 'saved') {
-            btn.innerHTML  = '&#10003; Saved';
-            btn.disabled   = false;
-            btn.style.background  = '#16A34A';
-            btn.style.borderColor = '#16A34A';
+            el.innerHTML = '&#10003; Saved';
+            el.style.color = '#4ADE80';
             setTimeout(() => {
-                btn.innerHTML         = '&#128190; Save';
-                btn.style.background  = '';
-                btn.style.borderColor = '';
+                el.innerHTML   = '&#10003; Auto-save on';
+                el.style.color = 'rgba(255,255,255,0.65)';
             }, 2000);
         } else if (status === 'error') {
-            btn.innerHTML  = '&#10007; Error';
-            btn.disabled   = false;
-            btn.style.background  = '#EF4444';
-            btn.style.borderColor = '#EF4444';
+            el.innerHTML = '&#10007; Save failed';
+            el.style.color = '#FCA5A5';
             setTimeout(() => {
-                btn.innerHTML         = '&#128190; Save';
-                btn.style.background  = '';
-                btn.style.borderColor = '';
+                el.innerHTML   = '&#10003; Auto-save on';
+                el.style.color = 'rgba(255,255,255,0.65)';
             }, 3000);
         } else {
-            btn.innerHTML  = '&#128190; Save';
-            btn.disabled   = false;
-            btn.style.background  = '';
-            btn.style.borderColor = '';
+            el.innerHTML   = '&#10003; Auto-save on';
+            el.style.color = 'rgba(255,255,255,0.65)';
         }
     }
 
