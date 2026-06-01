@@ -626,14 +626,14 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-text { color: #94A3B8; font-size: 0.85rem; font-weight: 400; }
 
-        /* ── Main page top bar ── */
-        .main-top-bar {
+        /* ── Detail page top bar ── */
+        .detail-top-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 28px;
+            margin-bottom: 22px;
         }
-        .main-top-bar .page-intro { margin-bottom: 0; }
+        .detail-top-bar .back-btn { margin-bottom: 0; }
         .guide-btn {
             display: inline-flex;
             align-items: center;
@@ -757,10 +757,7 @@
      MAIN PAGE — Workstream tile grid
 ════════════════════════════════════════════════ -->
 <div id="main-page">
-    <div class="main-top-bar">
-        <p class="page-intro">Select a workstream to view its training and communications dashboard.</p>
-        <button class="guide-btn" onclick="openGuide()">&#128203; Dashboard Guide</button>
-    </div>
+    <p class="page-intro">Select a workstream to view its training and communications dashboard.</p>
     <div id="main-loading" class="loading-overlay">
         <div class="spinner"></div>
         <div class="loading-text">Loading workstreams...</div>
@@ -773,7 +770,10 @@
 ════════════════════════════════════════════════ -->
 <div id="detail-page">
 
-    <button class="back-btn" onclick="goBack()">&#8592; Back to All Workstreams</button>
+    <div class="detail-top-bar">
+        <button class="back-btn" onclick="goBack()">&#8592; Back to All Workstreams</button>
+        <button class="guide-btn" onclick="openGuide()">&#128203; Dashboard Guide</button>
+    </div>
     <div id="detail-loading" class="loading-overlay">
         <div class="spinner"></div>
         <div class="loading-text">Loading dashboard...</div>
@@ -940,7 +940,7 @@
             <div class="guide-panel">
                 <div class="guide-panel-label">Column Details</div>
                 <p class="guide-col-line"><strong>All assets:</strong> Asset Name &nbsp;&bull;&nbsp; Audience &nbsp;&bull;&nbsp; Status &nbsp;&bull;&nbsp; Current Owner</p>
-                <p class="guide-col-note">&#128279; The Asset Name column supports hyperlinks — click the link icon in Edit mode to attach a URL to any asset.</p>
+                <p class="guide-col-note">&#128279; The Asset Name column supports hyperlinks. Click the Name to open the corresponding resource.</p>
             </div>
 
         </div>
@@ -1623,13 +1623,13 @@
 
     // ── Guide page ───────────────────────────────────
     function openGuide() {
-        document.getElementById('main-page').style.display  = 'none';
-        document.getElementById('guide-page').style.display = 'block';
+        document.getElementById('detail-page').style.display = 'none';
+        document.getElementById('guide-page').style.display  = 'block';
         window.scrollTo(0, 0);
     }
     function closeGuide() {
-        document.getElementById('guide-page').style.display = 'none';
-        document.getElementById('main-page').style.display  = 'block';
+        document.getElementById('guide-page').style.display  = 'none';
+        document.getElementById('detail-page').style.display = 'block';
         window.scrollTo(0, 0);
     }
 
