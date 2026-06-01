@@ -626,6 +626,103 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-text { color: #94A3B8; font-size: 0.85rem; font-weight: 400; }
 
+        /* ── Main page top bar ── */
+        .main-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .main-top-bar .page-intro { margin-bottom: 0; }
+        .guide-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            color: #475569;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            font-family: 'EJ Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            transition: all 0.12s;
+            flex-shrink: 0;
+        }
+        .guide-btn:hover { border-color: #3B82F6; color: #3B82F6; background: #EFF6FF; }
+
+        /* ── Guide page ── */
+        #guide-page { display: none; padding: 32px 40px; }
+        .guide-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 24px;
+        }
+        .guide-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        .guide-left { display: flex; flex-direction: column; gap: 16px; }
+        .guide-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+        .guide-panel-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #94A3B8;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        /* Status rows */
+        .guide-status-list { display: flex; flex-direction: column; gap: 14px; }
+        .guide-status-row  { display: flex; align-items: center; gap: 16px; }
+        .guide-status-row .status-chip { min-width: 138px; text-align: center; padding: 4px 12px; }
+        .guide-status-desc { font-size: 0.85rem; color: #475569; font-weight: 300; }
+        /* Column details */
+        .guide-col-line { font-size: 0.82rem; color: #334155; line-height: 1.6; }
+        .guide-col-line strong { font-weight: 600; }
+        .guide-col-note { font-size: 0.77rem; color: #94A3B8; font-weight: 300; margin-top: 10px; }
+        /* Asset types */
+        .guide-asset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 24px;
+        }
+        .guide-asset-col { display: flex; flex-direction: column; gap: 14px; }
+        .guide-asset-col-title {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #94A3B8;
+            margin-bottom: 6px;
+        }
+        .guide-asset-item { display: flex; align-items: flex-start; gap: 10px; }
+        .guide-asset-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+        .guide-asset-name { font-size: 0.85rem; font-weight: 600; color: #1E293B; line-height: 1.2; }
+        .guide-asset-desc { font-size: 0.73rem; color: #64748B; font-weight: 300; margin-top: 2px; }
+
         /* ── Responsive ── */
         @media (max-width: 860px) {
             .section-columns { grid-template-columns: 1fr; }
@@ -660,7 +757,10 @@
      MAIN PAGE — Workstream tile grid
 ════════════════════════════════════════════════ -->
 <div id="main-page">
-    <p class="page-intro">Select a workstream to view its training and communications dashboard.</p>
+    <div class="main-top-bar">
+        <p class="page-intro">Select a workstream to view its training and communications dashboard.</p>
+        <button class="guide-btn" onclick="openGuide()">&#128203; Dashboard Guide</button>
+    </div>
     <div id="main-loading" class="loading-overlay">
         <div class="spinner"></div>
         <div class="loading-text">Loading workstreams...</div>
@@ -802,6 +902,141 @@
     </div><!-- end panel -->
 
 </div><!-- end detail page -->
+
+<!-- ═══════════════════════════════════════════════
+     GUIDE PAGE — Dashboard reference
+════════════════════════════════════════════════ -->
+<div id="guide-page">
+    <button class="back-btn" onclick="closeGuide()">&#8592; Back to All Workstreams</button>
+    <h2 class="guide-title">Dashboard Guide &amp; Status Reference</h2>
+
+    <div class="guide-layout">
+
+        <!-- LEFT: Status + Column Details -->
+        <div class="guide-left">
+
+            <div class="guide-panel">
+                <div class="guide-panel-label">Status</div>
+                <div class="guide-status-list">
+                    <div class="guide-status-row">
+                        <span class="status-chip approved">Approved</span>
+                        <span class="guide-status-desc">Fully approved and ready to be published</span>
+                    </div>
+                    <div class="guide-status-row">
+                        <span class="status-chip ready-review">Ready for Review</span>
+                        <span class="guide-status-desc">Pending EDJ review</span>
+                    </div>
+                    <div class="guide-status-row">
+                        <span class="status-chip in-progress">In Progress</span>
+                        <span class="guide-status-desc">Undergoing ACN development</span>
+                    </div>
+                    <div class="guide-status-row">
+                        <span class="status-chip not-started">Not Started</span>
+                        <span class="guide-status-desc">To be developed</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="guide-panel">
+                <div class="guide-panel-label">Column Details</div>
+                <p class="guide-col-line"><strong>All assets:</strong> Asset Name &nbsp;&bull;&nbsp; Audience &nbsp;&bull;&nbsp; Status &nbsp;&bull;&nbsp; Current Owner</p>
+                <p class="guide-col-note">&#128279; The Asset Name column supports hyperlinks — click the link icon in Edit mode to attach a URL to any asset.</p>
+            </div>
+
+        </div>
+
+        <!-- RIGHT: Asset Types -->
+        <div class="guide-panel">
+            <div class="guide-panel-label">Asset Types</div>
+            <div class="guide-asset-grid">
+
+                <!-- Training -->
+                <div class="guide-asset-col">
+                    <div class="guide-asset-col-title">&#128218; Training</div>
+
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#EFF6FF;">&#128203;</div>
+                        <div>
+                            <div class="guide-asset-name">Job Aid</div>
+                            <div class="guide-asset-desc">Quick-reference task support</div>
+                        </div>
+                    </div>
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#F0FDF4;">&#128196;</div>
+                        <div>
+                            <div class="guide-asset-name">SOP</div>
+                            <div class="guide-asset-desc">Standard Operating Procedure</div>
+                        </div>
+                    </div>
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#F5F3FF;">&#128187;</div>
+                        <div>
+                            <div class="guide-asset-name">vILT</div>
+                            <div class="guide-asset-desc">Virtual Instructor-Led Training</div>
+                        </div>
+                    </div>
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#FFFBEB;">&#127891;</div>
+                        <div>
+                            <div class="guide-asset-name">eLearning / WBT</div>
+                            <div class="guide-asset-desc">Web-based training module</div>
+                        </div>
+                    </div>
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#FFF1F2;">&#127909;</div>
+                        <div>
+                            <div class="guide-asset-name">Overview Videos</div>
+                            <div class="guide-asset-desc">Short intro or explainer video</div>
+                        </div>
+                    </div>
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#ECFDF5;">&#128161;</div>
+                        <div>
+                            <div class="guide-asset-name">Pendo</div>
+                            <div class="guide-asset-desc">In-app guidance and walkthroughs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Communications -->
+                <div class="guide-asset-col">
+                    <div class="guide-asset-col-title">&#128172; Communications</div>
+
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#EFF6FF;">&#128232;</div>
+                        <div>
+                            <div class="guide-asset-name">Go-Live Series Messages</div>
+                            <div class="guide-asset-desc">Broadbrushing deployment messaging</div>
+                        </div>
+                    </div>
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#F0FDF4;">&#9989;</div>
+                        <div>
+                            <div class="guide-asset-name">Learning Checklists</div>
+                            <div class="guide-asset-desc">Persona-based readiness asset</div>
+                        </div>
+                    </div>
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#F5F3FF;">&#128218;</div>
+                        <div>
+                            <div class="guide-asset-name">Programmatic Resources</div>
+                            <div class="guide-asset-desc">Structured learning resources</div>
+                        </div>
+                    </div>
+                    <div class="guide-asset-item">
+                        <div class="guide-asset-icon" style="background:#FFFBEB;">&#128202;</div>
+                        <div>
+                            <div class="guide-asset-name">Change Impact Assessment</div>
+                            <div class="guide-asset-desc">Readiness &amp; change analysis</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
 
 <!-- ── Password Modal ── -->
 <div class="pw-overlay" id="pw-overlay">
@@ -1384,6 +1619,18 @@
             input.value = '';
             input.focus();
         }
+    }
+
+    // ── Guide page ───────────────────────────────────
+    function openGuide() {
+        document.getElementById('main-page').style.display  = 'none';
+        document.getElementById('guide-page').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+    function closeGuide() {
+        document.getElementById('guide-page').style.display = 'none';
+        document.getElementById('main-page').style.display  = 'block';
+        window.scrollTo(0, 0);
     }
 
     // ── Load workstreams from Supabase ───────────────
