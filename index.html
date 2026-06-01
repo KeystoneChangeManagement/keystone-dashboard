@@ -343,6 +343,29 @@
         body.view-mode .status-chip            { display: inline-block; }
         body:not(.view-mode) .status-select    { display: block; }
         body:not(.view-mode) .status-chip      { display: none !important; }
+        /* Percentage input (In Progress only) */
+        .pct-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: 5px;
+        }
+        .pct-input {
+            width: 50px;
+            padding: 3px 6px;
+            border: 1px solid #E2E8F0;
+            border-radius: 5px;
+            font-size: 0.78rem;
+            font-family: 'EJ Sans Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #334155;
+            outline: none;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        .pct-input::-webkit-inner-spin-button,
+        .pct-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .pct-input:focus { border-color: #D97706; }
+        .pct-sign { font-size: 0.78rem; color: #92400E; font-weight: 500; }
 
         /* ── Edit mode ── */
         [contenteditable]:hover {
@@ -1347,22 +1370,27 @@
     const STATUS_OPTIONS = ['Approved', 'Ready for Review', 'In Progress', 'Not Started'];
 
     function getStatusClass(value) {
-        switch (value) {
-            case 'Approved':         return 'approved';
-            case 'Ready for Review': return 'ready-review';
-            case 'In Progress':      return 'in-progress';
-            case 'Not Started':      return 'not-started';
-            default:                 return 'empty';
-        }
+        if (!value) return 'empty';
+        if (value === 'Approved')                    return 'approved';
+        if (value === 'Ready for Review')            return 'ready-review';
+        if (value.startsWith('In Progress'))         return 'in-progress';
+        if (value === 'Not Started')                 return 'not-started';
+        return 'empty';
     }
 
     function buildStatusCell(value) {
-        const td   = document.createElement('td');
+        const td = document.createElement('td');
         td.className = 'status-cell';
+
+        // Parse stored value — "In Progress (45%)" → base + pct
+        let statusBase = value || '';
+        let pctStored  = '';
+        const pctMatch = value ? value.match(/^In Progress \((\d+)%\)$/) : null;
+        if (pctMatch) { statusBase = 'In Progress'; pctStored = pctMatch[1]; }
 
         // View mode: colored chip
         const chip = document.createElement('span');
-        chip.className   = 'status-chip ' + getStatusClass(value);
+        chip.className   = 'status-chip ' + getStatusClass(statusBase);
         chip.textContent = value || '—';
         td.appendChild(chip);
 
@@ -1374,17 +1402,48 @@
         select.appendChild(blank);
         STATUS_OPTIONS.forEach(opt => {
             const option = document.createElement('option');
-            option.value       = opt;
-            option.textContent = opt;
-            if (opt === value) option.selected = true;
+            option.value = opt; option.textContent = opt;
+            if (opt === statusBase) option.selected = true;
             select.appendChild(option);
         });
+        td.appendChild(select);
+
+        // Percentage input (visible only when In Progress)
+        const pctWrapper = document.createElement('span');
+        pctWrapper.className    = 'pct-wrapper edit-control';
+        pctWrapper.style.display = statusBase === 'In Progress' ? 'inline-flex' : 'none';
+
+        const pctInput = document.createElement('input');
+        pctInput.type        = 'number';
+        pctInput.min         = '0';
+        pctInput.max         = '100';
+        pctInput.className   = 'pct-input';
+        pctInput.placeholder = '0';
+        pctInput.value       = pctStored;
+
+        const pctSign = document.createElement('span');
+        pctSign.className   = 'pct-sign';
+        pctSign.textContent = '%';
+
+        pctWrapper.appendChild(pctInput);
+        pctWrapper.appendChild(pctSign);
+        td.appendChild(pctWrapper);
+
+        // Keep chip in sync
+        function refreshChip() {
+            const val = select.value;
+            const pct = pctInput.value.trim();
+            chip.className   = 'status-chip ' + getStatusClass(val);
+            chip.textContent = (val === 'In Progress' && pct) ? `In Progress (${pct}%)` : (val || '—');
+        }
+
         select.addEventListener('change', () => {
-            chip.className   = 'status-chip ' + getStatusClass(select.value);
-            chip.textContent = select.value || '—';
+            pctWrapper.style.display = select.value === 'In Progress' ? 'inline-flex' : 'none';
+            if (select.value !== 'In Progress') pctInput.value = '';
+            refreshChip();
             scheduleAutoSave();
         });
-        td.appendChild(select);
+        pctInput.addEventListener('input', () => { refreshChip(); scheduleAutoSave(); });
 
         return td;
     }
@@ -1443,7 +1502,11 @@
                     }
                     // Audience + Owner tds (excludes name-cell, status-cell, edit-control)
                     const dataTds  = tr.querySelectorAll('td:not(.edit-control):not(.name-cell):not(.status-cell)');
-                    const statusVal = tr.querySelector('.status-select')?.value || '';
+                    const statusSel = tr.querySelector('.status-select');
+                    const statusPct = tr.querySelector('.pct-input');
+                    const selVal    = statusSel?.value || '';
+                    const pctVal    = statusPct?.value?.trim() || '';
+                    const statusVal = (selVal === 'In Progress' && pctVal) ? `In Progress (${pctVal}%)` : selVal;
                     rows.push({
                         workstream_id: currentWsId,
                         section: 'main', column_type: columnType, asset_type: assetType,
