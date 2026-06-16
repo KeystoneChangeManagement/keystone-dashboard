@@ -339,22 +339,6 @@
         }
         .link-btn:hover { color: #3B82F6; }
         .link-btn.has-url { color: #3B82F6; }
-        /* ── Apply to All button ── */
-        .apply-all-btn {
-            display: block;
-            margin: 4px auto 0;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.82rem;
-            padding: 2px 4px;
-            border-radius: 4px;
-            line-height: 1;
-            color: #94A3B8;
-            transition: color 0.12s, background 0.12s;
-        }
-        .apply-all-btn:hover { color: #3B82F6; background: #EFF6FF; }
-        .apply-all-btn.applied { color: #16A34A; }
 
         /* ── Status cell ── */
         .status-cell { vertical-align: middle; }
@@ -1175,7 +1159,7 @@
     let currentWsId     = null;
     let saveTimer       = null;
     let isSaving        = false;
-    let sessionUnlocked = false; // true once correct password entered this session
+    let sessionUnlocked = false;
     const grid = document.getElementById("tiles-grid");
 
     // ── Auto-save status indicator ───────────────────
@@ -1673,89 +1657,9 @@
         ownerTd.contentEditable = 'true';
         newRow.appendChild(ownerTd);
         addDeleteButton(newRow);
-        // Add "Apply to All" globe button inside the delete-button cell
-        const deleteTd = newRow.querySelector('td.edit-control');
-        const applyBtn = document.createElement('button');
-        applyBtn.className = 'apply-all-btn edit-control';
-        applyBtn.title     = 'Apply this row to all workstreams';
-        applyBtn.innerHTML = '&#127760;';
-        applyBtn.addEventListener('click', (e) => { e.stopPropagation(); applyRowToAll(applyBtn); });
-        deleteTd.appendChild(applyBtn);
         tbody.appendChild(newRow);
         newRow.querySelector('.name-edit-span').focus();
         updateCounts();
-    }
-
-    // ── Apply row to all workstreams ─────────────────
-    async function applyRowToAll(btn) {
-        const tr = btn.closest('tr');
-        if (!tr) return;
-
-        // Determine column type and asset type from DOM context
-        const block       = tr.closest('.asset-type');
-        const col         = tr.closest('.section-col');
-        const allCols     = Array.from(document.querySelectorAll('#detail-page .section-col'));
-        const columnType  = allCols.indexOf(col) === 0 ? 'training' : 'communications';
-        const assetType   = getAssetTypeName(block);
-
-        // Collect row values (same logic as saveFile)
-        const nameCell = tr.querySelector('.name-cell');
-        let col1val = '';
-        if (nameCell) {
-            const txt = (nameCell.querySelector('.name-edit-span')?.textContent || '').trim();
-            const url = nameCell.dataset.url || '';
-            col1val   = url ? txt + '|||' + url : txt;
-        }
-        const dataTds  = tr.querySelectorAll('td:not(.edit-control):not(.name-cell):not(.status-cell)');
-        const selVal   = tr.querySelector('.status-select')?.value || '';
-        const pctVal   = tr.querySelector('.pct-input')?.value?.trim() || '';
-        const statusVal = (selVal === 'In Progress' && pctVal) ? `In Progress (${pctVal}%)` : selVal;
-
-        const assetName = col1val.split('|||')[0] || '(unnamed)';
-        const otherWs   = workstreams.filter(ws => ws.id !== currentWsId);
-
-        if (otherWs.length === 0) { alert('No other workstreams found.'); return; }
-
-        const confirmed = confirm(
-            `Apply this row to all ${workstreams.length} workstreams?\n\n` +
-            `Asset: "${assetName}"\n` +
-            `Category: ${assetType}\n\n` +
-            `The same row will be added to every workstream.`
-        );
-        if (!confirmed) return;
-
-        // Save current workstream first so this row gets an ID
-        await saveFile(true);
-
-        // Insert into every other workstream
-        const insertRows = otherWs.map(ws => ({
-            workstream_id: ws.id,
-            section:       'main',
-            column_type:   columnType,
-            asset_type:    assetType,
-            col1: col1val,
-            col2: dataTds[0]?.textContent.trim() || '',
-            col3: statusVal,
-            col4: dataTds[1]?.textContent.trim() || '',
-            position: 9999
-        }));
-
-        const { error } = await db.from('dashboard_rows').insert(insertRows);
-        if (error) {
-            alert('Something went wrong — row was not applied to all workstreams.');
-            console.error(error);
-            return;
-        }
-
-        // Visual confirmation on the button
-        btn.innerHTML = '&#10003;';
-        btn.classList.add('applied');
-        btn.title = 'Applied to all workstreams';
-        setTimeout(() => {
-            btn.innerHTML = '&#127760;';
-            btn.classList.remove('applied');
-            btn.title = 'Apply this row to all workstreams';
-        }, 3000);
     }
 
     function addDeleteButton(row) {
