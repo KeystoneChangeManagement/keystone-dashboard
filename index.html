@@ -284,18 +284,7 @@
         .asset-table td:nth-child(4) { width: 22%; }
 
         /* ── Asset name cell with hyperlink support ── */
-        .name-cell { position: relative; vertical-align: middle; }
-        .name-edit-span {
-            display: inline;
-            outline: none;
-            word-break: break-word;
-        }
-        .name-edit-span:empty:before {
-            content: 'Enter name...';
-            color: #CBD5E1;
-            font-style: italic;
-            pointer-events: none;
-        }
+        .name-cell { vertical-align: middle; }
         .name-link {
             color: #3B82F6;
             text-decoration: none;
@@ -304,14 +293,38 @@
         }
         .name-link:hover { text-decoration: underline; }
         .name-plain { word-break: break-word; }
-        /* Edit mode: show editable span + link btn; hide view elements */
-        body:not(.view-mode) .name-edit-span { display: inline; }
+
+        /* Edit mode: flex row — text field fills space, link btn on right */
+        body:not(.view-mode) .name-cell {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        body:not(.view-mode) .name-edit-span {
+            display: block !important;
+            flex: 1;
+            min-height: 20px;
+            padding: 2px 5px;
+            border: 1px dashed #CBD5E1;
+            border-radius: 4px;
+            word-break: break-word;
+            outline: none;
+        }
+        body:not(.view-mode) .name-edit-span:hover { border-color: #94A3B8; }
+        body:not(.view-mode) .name-edit-span:focus  { border-color: #3B82F6; border-style: solid; background: #EFF6FF; }
+        .name-edit-span:empty:before {
+            content: 'Enter name...';
+            color: #CBD5E1;
+            font-style: italic;
+            pointer-events: none;
+        }
         body:not(.view-mode) .name-link,
-        body:not(.view-mode) .name-plain      { display: none !important; }
-        /* View mode: hide editable span + link btn; show view elements */
-        body.view-mode .name-edit-span        { display: none !important; }
+        body:not(.view-mode) .name-plain { display: none !important; }
+
+        /* View mode: show link or plain text, hide edit span */
+        body.view-mode .name-edit-span { display: none !important; }
         body.view-mode .name-link,
-        body.view-mode .name-plain            { display: inline; }
+        body.view-mode .name-plain      { display: inline; }
         .link-btn {
             background: none;
             border: none;
