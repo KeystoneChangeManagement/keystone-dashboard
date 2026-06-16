@@ -275,13 +275,13 @@
         /* ── Table column widths (all tables) ── */
         .asset-table { table-layout: fixed; }
         .asset-table th:nth-child(1),
-        .asset-table td:nth-child(1) { width: 40%; }
+        .asset-table td:nth-child(1) { width: 50%; }
         .asset-table th:nth-child(2),
-        .asset-table td:nth-child(2) { width: 20%; }
+        .asset-table td:nth-child(2) { width: 17%; }
         .asset-table th:nth-child(3),
-        .asset-table td:nth-child(3) { width: 20%; }
+        .asset-table td:nth-child(3) { width: 17%; }
         .asset-table th:nth-child(4),
-        .asset-table td:nth-child(4) { width: 20%; }
+        .asset-table td:nth-child(4) { width: 16%; }
 
         /* ── Asset name cell with hyperlink support ── */
         .name-cell { vertical-align: middle; }
@@ -294,17 +294,16 @@
         .name-link:hover { text-decoration: underline; }
         .name-plain { word-break: break-word; }
 
-        /* Edit mode: flex row — text field fills space, link btn on right */
+        /* Edit mode: name cell fills full column width, link btn floats over right edge */
         body:not(.view-mode) .name-cell {
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            position: relative;
         }
         body:not(.view-mode) .name-edit-span {
             display: block !important;
-            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
             min-height: 20px;
-            padding: 2px 5px;
+            padding: 2px 26px 2px 5px;
             border: 1px dashed #CBD5E1;
             border-radius: 4px;
             word-break: break-word;
@@ -312,6 +311,12 @@
         }
         body:not(.view-mode) .name-edit-span:hover { border-color: #94A3B8; }
         body:not(.view-mode) .name-edit-span:focus  { border-color: #3B82F6; border-style: solid; background: #EFF6FF; }
+        body:not(.view-mode) .link-btn {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
         .name-edit-span:empty:before {
             content: 'Enter name...';
             color: #CBD5E1;
