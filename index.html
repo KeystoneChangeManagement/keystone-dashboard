@@ -176,7 +176,24 @@
             margin-bottom: 18px;
             padding-bottom: 8px;
             border-bottom: 2px solid #E2E8F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
         }
+        .col-title:hover { color: #334155; border-bottom-color: #CBD5E1; }
+        .col-collapse-icon {
+            font-size: 0.65rem;
+            color: #94A3B8;
+            font-weight: normal;
+            letter-spacing: 0;
+            text-transform: none;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+        .section-col.col-collapsed .col-collapse-icon { transform: rotate(-90deg); }
+        .section-col.col-collapsed > .asset-type { display: none !important; }
 
         /* ── Asset type blocks ── */
         .asset-type { margin-bottom: 22px; }
@@ -628,6 +645,27 @@
         .tile-add:hover { border-color: #3B82F6; color: #3B82F6; background: #EFF6FF; }
         .tile-add-icon { font-size: 1.6rem; }
         .tile-add-label { font-size: 0.85rem; font-weight: 500; }
+
+        /* ── Collapsible asset categories ── */
+        .asset-type-header {
+            cursor: pointer;
+        }
+        .asset-type-header:hover {
+            background: #F1F5F9;
+        }
+        .collapse-icon {
+            font-size: 0.65rem;
+            color: #94A3B8;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+        .asset-type.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+        .asset-type.collapsed > .asset-table,
+        .asset-type.collapsed > .add-row-btn {
+            display: none !important;
+        }
 
         /* ── Loading spinner ── */
         .loading-overlay {
@@ -1722,9 +1760,42 @@
         hideLoading('main');
     }
 
+    // ── Collapsible asset categories ─────────────────
+    function initCollapsible() {
+        // Collapse entire Training / Communications columns
+        document.querySelectorAll('#detail-page .section-col').forEach(col => {
+            const title = col.querySelector('.col-title');
+            if (!title) return;
+            const chevron = document.createElement('span');
+            chevron.className = 'col-collapse-icon';
+            chevron.innerHTML = '&#9660;';
+            title.appendChild(chevron);
+            title.addEventListener('click', () => col.classList.toggle('col-collapsed'));
+        });
+
+        // Collapse individual asset categories
+        document.querySelectorAll('#detail-page .asset-type-header').forEach(header => {
+            // Group count badge + chevron on the right
+            const count   = header.querySelector('.asset-count');
+            const chevron = document.createElement('span');
+            chevron.className = 'collapse-icon';
+            chevron.innerHTML = '&#9660;';
+            const group = document.createElement('span');
+            group.style.cssText = 'display:inline-flex;align-items:center;gap:8px;';
+            header.appendChild(group);
+            group.appendChild(count);
+            group.appendChild(chevron);
+
+            header.addEventListener('click', () => {
+                header.closest('.asset-type').classList.toggle('collapsed');
+            });
+        });
+    }
+
     // ── Init ─────────────────────────────────────────
     loadWorkstreams();
     initEditMode();
+    initCollapsible();
     setupRealtime();
 </script>
 
