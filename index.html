@@ -1393,8 +1393,6 @@
             plain.textContent  = txt;
             scheduleAutoSave();
         });
-        td.appendChild(editSpan);
-
         // Edit: link button
         const linkBtn = document.createElement('button');
         linkBtn.className = 'link-btn edit-control' + (url ? ' has-url' : '');
@@ -1424,6 +1422,7 @@
             scheduleAutoSave();
         });
         td.appendChild(linkBtn);
+        td.appendChild(editSpan);
         return td;
     }
 
