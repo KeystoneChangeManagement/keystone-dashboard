@@ -1167,9 +1167,10 @@
         "#84CC16","#64748B","#7C3AED","#DC2626","#0891B2"
     ];
 
-    let currentWsId     = null;
-    let isSaving        = false;
-    let sessionUnlocked = false;
+    let currentWsId      = null;
+    let isSaving         = false;
+    let suppressRealtime = false;
+    let sessionUnlocked  = false;
     const grid = document.getElementById("tiles-grid");
 
     // ── Save button status ───────────────────────────
@@ -1533,6 +1534,7 @@
         if (!currentWsId) return;
         if (isSaving) return;
         isSaving = true;
+        suppressRealtime = true;
         if (!silent) setSaveStatus('saving');
 
         // Collect all visible rows
@@ -1583,6 +1585,7 @@
         }
 
         isSaving = false;
+        setTimeout(() => { suppressRealtime = false; }, 3000);
         if (!silent) setSaveStatus('saved');
     }
 
@@ -1597,6 +1600,7 @@
             .on('postgres_changes', { event: '*', schema: 'public', table: 'dashboard_rows' },
                 payload => {
                     const wsId = payload.new?.workstream_id || payload.old?.workstream_id;
+                    if (suppressRealtime) return;
                     if (currentWsId && wsId === currentWsId) openWorkstream(currentWsId);
                 })
             .subscribe();
