@@ -503,18 +503,24 @@
             cursor: default;
         }
 
-        .autosave-indicator {
+        .save-btn {
             display: none;
             align-items: center;
-            gap: 6px;
-            font-size: 0.78rem;
-            font-weight: 400;
-            color: rgba(255,255,255,0.65);
             margin-left: 12px;
+            padding: 5px 16px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
             white-space: nowrap;
-            transition: color 0.2s;
+            transition: background 0.15s;
         }
-        body:not(.view-mode) .autosave-indicator { display: flex; }
+        .save-btn:hover:not(:disabled) { background: rgba(255,255,255,0.25); }
+        .save-btn:disabled { opacity: 0.6; cursor: default; }
+        body:not(.view-mode) .save-btn { display: inline-flex; }
 
         /* ── Lock icon ── */
         .lock-icon {
@@ -824,7 +830,7 @@
         <span class="mode-label">Edit</span>
         <span class="lock-icon" id="lock-icon">&#128274;</span>
     </div>
-    <div class="autosave-indicator" id="autosave-indicator">&#10003; Auto-save on</div>
+    <button class="save-btn edit-control" id="save-btn">Save</button>
 </div>
 
 <!-- ═══════════════════════════════════════════════
@@ -1157,44 +1163,29 @@
     ];
 
     let currentWsId     = null;
-    let saveTimer       = null;
     let isSaving        = false;
     let sessionUnlocked = false;
     const grid = document.getElementById("tiles-grid");
 
-    // ── Auto-save status indicator ───────────────────
+    // ── Save button status ───────────────────────────
     function setSaveStatus(status) {
-        const el = document.getElementById('autosave-indicator');
-        if (!el) return;
+        const btn = document.getElementById('save-btn');
+        if (!btn) return;
         if (status === 'saving') {
-            el.innerHTML = '&#8987; Saving...';
-            el.style.color = 'rgba(255,255,255,0.5)';
+            btn.textContent = 'Saving...';
+            btn.disabled    = true;
         } else if (status === 'saved') {
-            el.innerHTML = '&#10003; Saved';
-            el.style.color = '#4ADE80';
-            setTimeout(() => {
-                el.innerHTML   = '&#10003; Auto-save on';
-                el.style.color = 'rgba(255,255,255,0.65)';
-            }, 2000);
+            btn.textContent = 'Saved ✓';
+            btn.disabled    = false;
+            setTimeout(() => { btn.textContent = 'Save'; }, 2000);
         } else if (status === 'error') {
-            el.innerHTML = '&#10007; Save failed';
-            el.style.color = '#FCA5A5';
-            setTimeout(() => {
-                el.innerHTML   = '&#10003; Auto-save on';
-                el.style.color = 'rgba(255,255,255,0.65)';
-            }, 3000);
+            btn.textContent = 'Save failed';
+            btn.disabled    = false;
+            setTimeout(() => { btn.textContent = 'Save'; }, 3000);
         } else {
-            el.innerHTML   = '&#10003; Auto-save on';
-            el.style.color = 'rgba(255,255,255,0.65)';
+            btn.textContent = 'Save';
+            btn.disabled    = false;
         }
-    }
-
-    // ── Auto-save (debounced 2 seconds after last change) ──
-    function scheduleAutoSave() {
-        if (!currentWsId) return;
-        clearTimeout(saveTimer);
-        setSaveStatus('saving');
-        saveTimer = setTimeout(() => saveFile(), 2000);
     }
 
     // ── Loading helpers ──────────────────────────────
@@ -1311,7 +1302,6 @@
 
     async function goBack() {
         if (currentWsId) {
-            clearTimeout(saveTimer);
             await saveFile(true); // silent save before leaving
         }
         document.getElementById("detail-page").style.display = "none";
@@ -1391,7 +1381,6 @@
             const txt = editSpan.textContent;
             anchor.textContent = txt;
             plain.textContent  = txt;
-            scheduleAutoSave();
         });
         // Edit: link button
         const linkBtn = document.createElement('button');
@@ -1419,7 +1408,6 @@
             }
             anchor.textContent = editSpan.textContent;
             plain.textContent  = editSpan.textContent;
-            scheduleAutoSave();
         });
         td.appendChild(linkBtn);
         td.appendChild(editSpan);
@@ -1501,7 +1489,6 @@
             pctWrapper.style.display = select.value === 'In Progress' ? 'inline-flex' : 'none';
             if (select.value !== 'In Progress') pctInput.value = '';
             refreshChip();
-            scheduleAutoSave();
         });
         pctInput.addEventListener('input', () => { refreshChip(); scheduleAutoSave(); });
 
@@ -1633,8 +1620,8 @@
         });
         document.getElementById('detail-page').addEventListener('input', () => {
             updateCounts();
-            scheduleAutoSave();
         });
+        document.getElementById('save-btn').addEventListener('click', () => saveFile());
     }
 
     function addRow(table) {
@@ -1702,7 +1689,6 @@
         } else {
             // Save any pending changes before switching to view mode
             if (currentWsId) {
-                clearTimeout(saveTimer);
                 await saveFile(true);
             }
             document.body.classList.add('view-mode');
