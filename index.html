@@ -1170,6 +1170,7 @@
     let currentWsId      = null;
     let isSaving         = false;
     let suppressRealtime = false;
+    let wsLoadGen        = 0; // increments on every openWorkstream call; stale loads self-cancel
     let sessionUnlocked  = false;
     const grid = document.getElementById("tiles-grid");
 
@@ -1286,6 +1287,7 @@
 
     // ── Navigation ───────────────────────────────────
     async function openWorkstream(wsId) {
+        const gen = ++wsLoadGen;
         currentWsId = wsId;
         const ws = workstreams.find(w => w.id === wsId);
         document.getElementById("detail-title").textContent = ws.name;
@@ -1301,6 +1303,7 @@
         const { data: rows, error } = await db.from('dashboard_rows')
             .select('*').eq('workstream_id', wsId).order('position');
         hideLoading('detail');
+        if (gen !== wsLoadGen) return; // a newer load started — discard this result
         if (error) { console.error(error); return; }
         populateTables(rows);
         updateCounts();
