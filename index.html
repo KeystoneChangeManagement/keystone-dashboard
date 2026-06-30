@@ -347,6 +347,25 @@
         .link-btn:hover { color: #3B82F6; }
         .link-btn.has-url { color: #3B82F6; }
 
+        /* ── Drag-and-drop row reordering ── */
+        .drag-handle-btn {
+            display: block;
+            background: none;
+            border: none;
+            cursor: grab;
+            color: #CBD5E1;
+            font-size: 1rem;
+            padding: 1px 4px;
+            margin: 0 auto 3px;
+            line-height: 1;
+            user-select: none;
+        }
+        .drag-handle-btn:hover { color: #64748B; }
+        .drag-handle-btn:active { cursor: grabbing; }
+        tr.dragging { opacity: 0.35; }
+        tr.drag-over-top    { box-shadow: 0 -2px 0 0 #3B82F6 inset; }
+        tr.drag-over-bottom { box-shadow: 0 -2px 0 0 #3B82F6; }
+
         /* ── Status cell ── */
         .status-cell { vertical-align: middle; }
         .status-chip {
@@ -1173,6 +1192,7 @@
     let isSaving         = false;
     let suppressRealtime = false;
     let wsLoadGen        = 0; // increments on every openWorkstream call; stale loads self-cancel
+    let dragSrc          = null;
     let sessionUnlocked  = false;
     const grid = document.getElementById("tiles-grid");
 
@@ -1677,6 +1697,16 @@
         const td  = document.createElement('td');
         td.className = 'edit-control';
         td.style.cssText = 'text-align:center; padding:4px; vertical-align:middle;';
+
+        // Drag handle
+        const handle = document.createElement('button');
+        handle.className = 'drag-handle-btn edit-control';
+        handle.innerHTML = '&#8942;&#8942;';
+        handle.title = 'Drag to reorder';
+        handle.addEventListener('pointerdown', () => { row.draggable = true; });
+        td.appendChild(handle);
+
+        // Delete button
         const btn = document.createElement('button');
         btn.className = 'delete-btn edit-control';
         btn.innerHTML = '&times;';
@@ -1692,6 +1722,40 @@
         });
         td.appendChild(btn);
         row.appendChild(td);
+
+        // Drag events
+        row.addEventListener('dragstart', (e) => {
+            dragSrc = row;
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => row.classList.add('dragging'), 0);
+        });
+        row.addEventListener('dragend', () => {
+            row.draggable = false;
+            row.classList.remove('dragging');
+            document.querySelectorAll('.drag-over-top, .drag-over-bottom')
+                .forEach(r => r.classList.remove('drag-over-top', 'drag-over-bottom'));
+            dragSrc = null;
+        });
+        row.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (!dragSrc || dragSrc === row || dragSrc.parentNode !== row.parentNode) return;
+            document.querySelectorAll('.drag-over-top, .drag-over-bottom')
+                .forEach(r => r.classList.remove('drag-over-top', 'drag-over-bottom'));
+            const mid = row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+            row.classList.add(e.clientY < mid ? 'drag-over-top' : 'drag-over-bottom');
+        });
+        row.addEventListener('dragleave', (e) => {
+            if (!row.contains(e.relatedTarget)) {
+                row.classList.remove('drag-over-top', 'drag-over-bottom');
+            }
+        });
+        row.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (!dragSrc || dragSrc === row || dragSrc.parentNode !== row.parentNode) return;
+            const mid = row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+            row.parentNode.insertBefore(dragSrc, e.clientY < mid ? row : row.nextSibling);
+            row.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
     }
 
     function updateCounts() {
